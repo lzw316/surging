@@ -114,26 +114,28 @@ namespace Surging.Core.CPlatform.Runtime.Server.Implementation.ServiceDiscovery.
             var methodValidateAttribute = attributes.Where(p => p is ValidateAttribute)
                 .Cast<ValidateAttribute>().FirstOrDefault();
             var isReactive = attributes.Any(p => p is ReactiveAttribute);
+            var type = method.DeclaringType;
+            var methParameters = method.GetParameters();
             return new ServiceEntry
             {
                 Descriptor = serviceDescriptor,
                 RoutePath = serviceDescriptor.RoutePath,
                 Methods = httpMethods,
                 MethodName = method.Name,
-                Type = method.DeclaringType,
-                Parameters = method.GetParameters(),
+                Type = type,
+                Parameters = methParameters,
                 IsPermission = method.DeclaringType.GetCustomAttribute<BaseActionFilterAttribute>() != null || attributes.Any(p => p is BaseActionFilterAttribute),
                 Attributes = attributes,
                 Func = (key, parameters) =>
              {
                  object instance = null;
                  if (AppConfig.ServerOptions.IsModulePerLifetimeScope)
-                     instance = _serviceProvider.GetInstancePerLifetimeScope(key, method.DeclaringType);
+                     instance = _serviceProvider.GetInstancePerLifetimeScope(key, type);
                  else
-                     instance = _serviceProvider.GetInstances(key, method.DeclaringType);
+                     instance = _serviceProvider.GetInstances(key, type);
                  var list = new List<object>();
 
-                 foreach (var parameterInfo in method.GetParameters())
+                 foreach (var parameterInfo in methParameters)
                  {
                      //加入是否有默认值的判断，有默认值，并且用户没传，取默认值
                      if (parameterInfo.HasDefaultValue && !parameters.ContainsKey(parameterInfo.Name))

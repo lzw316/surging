@@ -81,7 +81,7 @@ namespace Surging.Core.Protocol.WS.Runtime.Implementation
             var entry = _wSServiceEntries.Where(p => p.Path == path).FirstOrDefault();
             entry.FuncBehavior = () =>
             {
-                var behavior =GetWebSocketBehavior(entry.Service, _options?.Behavior, entry.BehaviorAttribute);
+                var behavior =GetWebSocketBehavior(entry.Service, _options?.Behavior, entry.BehaviorAttribute,entry.Behavior.Server);
                 behavior.Client = client;
                 return behavior;
             };
@@ -109,42 +109,46 @@ namespace Surging.Core.Protocol.WS.Runtime.Implementation
                     Path = path,
                     FuncBehavior = () =>
                     {
-                        return GetWebSocketBehavior(service, _options?.Behavior, behaviorContract);
+                        return GetWebSocketBehavior(service, _options?.Behavior, behaviorContract, behavior.Server);
                     }
                 };
             return result;
         }
 
-        private WebSocketBehavior GetWebSocketBehavior(Type service,BehaviorOption option, BehaviorContractAttribute contractAttribute)
+        private WebSocketBehavior GetWebSocketBehavior(Type service,BehaviorOption option, BehaviorContractAttribute contractAttribute, Func<WebSocketServer> webSocketServer)
         {
             var wsBehavior = _serviceProvider.GetInstances(service) as WebSocketBehavior;
             if (option != null)
             {
                 wsBehavior.IgnoreExtensions = option.IgnoreExtensions;
                 wsBehavior.Protocol = option.Protocol;
+                wsBehavior.Server = webSocketServer;
                 wsBehavior.EmitOnPing = option.EmitOnPing;
             }
             if (contractAttribute != null)
             {
                 wsBehavior.IgnoreExtensions = contractAttribute.IgnoreExtensions;
                 wsBehavior.Protocol = contractAttribute.Protocol;
+                wsBehavior.Server = webSocketServer;
                 wsBehavior.EmitOnPing = contractAttribute.EmitOnPing;
             } 
             return wsBehavior;
         }
 
-        private WebSocketBehavior GetWebSocketBehavior(WebSocketBehavior wsBehavior, BehaviorOption option, BehaviorContractAttribute contractAttribute)
+        private WebSocketBehavior GetWebSocketBehavior(WebSocketBehavior wsBehavior, BehaviorOption option, BehaviorContractAttribute contractAttribute, Func<WebSocketServer> webSocketServer)
         { 
             if (option != null)
             {
                 wsBehavior.IgnoreExtensions = option.IgnoreExtensions;
                 wsBehavior.Protocol = option.Protocol;
+                wsBehavior.Server = webSocketServer;
                 wsBehavior.EmitOnPing = option.EmitOnPing;
             }
             if (contractAttribute != null)
             {
                 wsBehavior.IgnoreExtensions = contractAttribute.IgnoreExtensions;
                 wsBehavior.Protocol = contractAttribute.Protocol;
+                wsBehavior.Server = webSocketServer;
                 wsBehavior.EmitOnPing = contractAttribute.EmitOnPing;
             }
             return wsBehavior;

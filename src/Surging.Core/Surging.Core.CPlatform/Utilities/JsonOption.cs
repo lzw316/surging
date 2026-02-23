@@ -13,7 +13,7 @@ namespace Surging.Core.CPlatform.Utilities
         public static JsonSerializerOptions SerializeOptions { get; set; } = new JsonSerializerOptions()
         { 
             WriteIndented = true,
-            Converters = { new JsonElementJsonConverter() }
+            Converters = { new JsonElementJsonConverter()}
 
         };
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 using Surging.Core.CPlatform.Routing;
 using Surging.Core.CPlatform.Routing.Implementation;
 using Surging.Core.CPlatform.Runtime.Server;
@@ -119,7 +120,7 @@ namespace Surging.Core.CPlatform.Routing.Implementation
             return await SearchRouteAsync(path);
         }
 
-        public async Task RegisterRoutes(decimal processorTime)
+        public async Task RegisterRoutes(decimal processorTime, bool isOptional=false)
         {
             var addess = NetUtils.GetHostAddress();
             addess.ProcessorTime = processorTime;
@@ -127,7 +128,16 @@ namespace Surging.Core.CPlatform.Routing.Implementation
             if (addess.Weight > 0)
                 addess.Timestamp = DateTimeConverter.DateTimeToUnixTimestamp(DateTime.Now);
             RpcContext.GetContext().SetAttachment("Host", addess);
-            var addressDescriptors = _serviceEntryManager.GetEntries().Select(i =>
+            IEnumerable<ServiceEntry> serviceEntries = default;
+            if (isOptional)
+            {
+                serviceEntries = _serviceEntryManager.GetMicroEntries();
+            }
+            else
+            {
+                serviceEntries = _serviceEntryManager.GetEntries();
+            }
+            var addressDescriptors = serviceEntries.Select(i =>
             {
                 i.Descriptor.Token = _serviceTokenGenerator.GetToken();
                 return new ServiceRoute

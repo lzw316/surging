@@ -13,6 +13,8 @@ namespace Surging.Core.CPlatform.Runtime.Server
         /// <returns>服务条目集合。</returns>
         IEnumerable<ServiceEntry> GetEntries();
 
+        IEnumerable<ServiceEntry> GetMicroEntries();
+
         void UpdateEntries(IEnumerable<IServiceEntryProvider> providers);
 
         IEnumerable<ServiceEntry> GetAllEntries();

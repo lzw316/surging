@@ -15,6 +15,7 @@ namespace Surging.IModuleServices.Common
     [BehaviorContract(IgnoreExtensions =true)]
     public  interface IChatService: IServiceKey
     {
+        [Micro] //Add the reference stage.If service registration is required,  add [Micro]
         [Command( ShuntStrategy=AddressSelectorMode.HashAlgorithm)]
         Task SendMessage(string name,string data);
     }

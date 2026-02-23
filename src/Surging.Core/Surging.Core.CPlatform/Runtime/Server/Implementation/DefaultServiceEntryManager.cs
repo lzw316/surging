@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Surging.Core.CPlatform.Runtime.Server.Implementation.ServiceDiscovery.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -56,6 +57,16 @@ namespace Surging.Core.CPlatform.Runtime.Server.Implementation
         public IEnumerable<ServiceEntry> GetEntries()
         {
             return _serviceEntries;
+        }
+
+        /// <summary>
+        /// 获取服务条目集合。
+        /// </summary>
+        /// <returns>服务条目集合。</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<ServiceEntry> GetMicroEntries()
+        {
+            return _serviceEntries.Where(p=>p.Attributes.OfType<MicroAttribute>().Any());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

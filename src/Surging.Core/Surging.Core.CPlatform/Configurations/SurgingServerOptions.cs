@@ -19,7 +19,6 @@ namespace Surging.Core.CPlatform.Configurations
 
         public bool IsModulePerLifetimeScope { get; set; }
          
-
         public double WatchInterval { get; set; } = 20d;
 
         public int DisconnTimeInterval { get; set; } = 60;
@@ -52,6 +51,8 @@ namespace Surging.Core.CPlatform.Configurations
         public int Port { get; set; }
 
         public bool DisableServiceRegistration { get; set; }
+
+        public List<string> DisableDiagnosticServiceId { get; set; } = [];
 
         public bool DisableDiagnostic { get; set; }
 

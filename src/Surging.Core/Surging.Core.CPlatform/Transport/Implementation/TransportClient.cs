@@ -169,10 +169,11 @@ namespace Surging.Core.CPlatform.Transport.Implementation
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WirteDiagnosticBefore(TransportMessage message)
-        {
-            if (!AppConfig.ServerOptions.DisableDiagnostic)
+        {   
+            var remoteInvokeMessage = message.GetContent<RemoteInvokeMessage>();
+            if (!AppConfig.ServerOptions.DisableDiagnostic &&
+                !AppConfig.ServerOptions.DisableDiagnosticServiceId.Contains(remoteInvokeMessage.ServiceId))
             {
-                var remoteInvokeMessage = message.GetContent<RemoteInvokeMessage>();
                 remoteInvokeMessage.Attachments.TryGetValue("TraceId", out object traceId);
                 _diagnosticListener.WriteTransportBefore(TransportType.Rpc, new TransportEventData(new DiagnosticMessage
                 {

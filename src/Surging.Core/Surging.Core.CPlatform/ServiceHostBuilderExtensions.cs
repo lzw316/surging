@@ -1,26 +1,27 @@
 ﻿using Autofac;
-using Surging.Core.CPlatform.Support;
-using System.Linq;
-using Surging.Core.CPlatform.Routing;
+using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Surging.Core.CPlatform.Address;
-using System.Threading.Tasks;
-using Surging.Core.ServiceHosting.Internal;
+using Surging.Core.CPlatform.Configurations;
+using Surging.Core.CPlatform.Engines;
+using Surging.Core.CPlatform.Module;
+using Surging.Core.CPlatform.Protocol;
+using Surging.Core.CPlatform.Routing;
+using Surging.Core.CPlatform.Runtime.Client;
 using Surging.Core.CPlatform.Runtime.Server;
+using Surging.Core.CPlatform.Support;
+using Surging.Core.CPlatform.Transport.Implementation;
+using Surging.Core.CPlatform.Utilities;
+using Surging.Core.ServiceHosting.Internal;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using Microsoft.Extensions.Logging;
-using Surging.Core.CPlatform.Runtime.Client;
-using System;
-using Surging.Core.CPlatform.Configurations;
-using Surging.Core.CPlatform.Module;
-using System.Diagnostics;
-using Surging.Core.CPlatform.Engines;
-using Surging.Core.CPlatform.Utilities;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using Surging.Core.CPlatform.Transport.Implementation;
-using Surging.Core.CPlatform.Protocol;
+using System.Threading.Tasks;
 
 namespace Surging.Core.CPlatform
 {
@@ -43,11 +44,9 @@ namespace Surging.Core.CPlatform
                 {
                     mapper.Resolve<IProtocolSupportProvider>().Initialize();
                 }, TaskCreationOptions.LongRunning);
-                if (!AppConfig.ServerOptions.DisableServiceRegistration)
-                {
-                    await mapper.Resolve<IServiceCommandManager>().SetServiceCommandsAsync();
-                    await ConfigureRoute(mapper);
-                }
+                var isOptional = AppConfig.ServerOptions.DisableServiceRegistration;
+                await mapper.Resolve<IServiceCommandManager>().SetServiceCommandsAsync(isOptional);
+                await ConfigureRoute(mapper, isOptional);
                 var serviceHosts = mapper.Resolve<IList<Runtime.Server.IServiceHost>>();
                 Task.Factory.StartNew(async () =>
                 {
@@ -102,7 +101,7 @@ namespace Surging.Core.CPlatform
             }
         }
 
-        public static async Task ConfigureRoute(IContainer mapper)
+        public static async Task ConfigureRoute(IContainer mapper,bool isOptional)
         {
             if (AppConfig.ServerOptions.Protocol == CommunicationProtocol.Tcp ||
              AppConfig.ServerOptions.Protocol == CommunicationProtocol.None)
@@ -113,7 +112,7 @@ namespace Surging.Core.CPlatform
                         async () => await routeProvider.RegisterRoutes(
                         Math.Round(Convert.ToDecimal(Process.GetCurrentProcess().TotalProcessorTime.TotalSeconds), 2, MidpointRounding.AwayFromZero)));
                 else
-                    await routeProvider.RegisterRoutes(0);
+                    await routeProvider.RegisterRoutes(0, isOptional);
             }
         }
 

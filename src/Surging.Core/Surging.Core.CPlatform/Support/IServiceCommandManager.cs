@@ -40,7 +40,7 @@ namespace Surging.Core.CPlatform.Support
         Task SetServiceCommandsAsync(IEnumerable<ServiceCommandDescriptor> commands);
 
 
-        Task SetServiceCommandsAsync();
+        Task SetServiceCommandsAsync(bool isOptional = false);
         /// <summary>
         /// 清空所有的服务命令。
         /// </summary>

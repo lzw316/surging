@@ -102,7 +102,7 @@ namespace Surging.Core.Protocol.WS
         public WebSocketSessionManager GetClient()
         {
             WebSocketSessionManager result = null;
-            var server = ServiceLocator.GetService<DefaultWSServerMessageListener>().Server;
+            var server = this.Server();
             var entries = ServiceLocator.GetService<IWSServiceEntryProvider>().GetEntries();
             var entry = entries.Where(p => p.Type == this.GetType()).FirstOrDefault();
             if (server.WebSocketServices.TryGetServiceHost(entry.Path, out WebSocketServiceHostBase webSocketServiceHost))
