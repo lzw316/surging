@@ -4,6 +4,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using Surging.Core.CPlatform.Utilities;
 using Surging.Tools.Cli.Commands;
+using Surging.Tools.Cli2.Commands;
 
 namespace Surging.Tools.Cli2
 {
@@ -18,10 +19,14 @@ namespace Surging.Tools.Cli2
         private readonly IServiceProvider _serviceProvider;
         // private readonly CommandLineApplication _curlCommand;
         private readonly CommandLineApplication _runCommand;
+        private readonly CommandLineApplication _lsCommand;
+       // private readonly CommandLineApplication _installCommand;
         public Program()
         {
             // _curlCommand = new CommandLineApplication<CurlCommand>();
             _runCommand = new CommandLineApplication<RunCommand>();
+            //_installCommand = new CommandLineApplication<InstallCommand>();
+            _lsCommand = new CommandLineApplication<LsCommand>();
             _serviceProvider = ConfigureServices();
 
         }
@@ -32,11 +37,18 @@ namespace Surging.Tools.Cli2
             return new Program().Execute(args);
         }
 
+        [Option("-m|--method", "open doc", CommandOptionType.NoValue)]
+        public bool Method { get; }
+
+        [Option("-d|--data", "open doc", CommandOptionType.NoValue)]
+        public bool data { get; }
 
         private int Execute(string[] args)
         {
             var app = new CommandLineApplication<Program>();
             app.AddSubcommand(_runCommand);
+           // app.AddSubcommand(_installCommand);
+            app.AddSubcommand(_lsCommand);
             app.Conventions
                 .UseDefaultConventions()
                 .UseConstructorInjection(_serviceProvider);
@@ -61,7 +73,7 @@ namespace Surging.Tools.Cli2
             serviceCollection.AddSingleton<IConsole>(PhysicalConsole.Singleton);
             var builder = new ContainerBuilder();
             builder.Populate(serviceCollection);
-         
+
             // builder.Register(provider=> _curlCommand).As<CommandLineApplication>().SingleInstance();
             ServiceLocator.Current = builder.Build();
             return serviceCollection.BuildServiceProvider();

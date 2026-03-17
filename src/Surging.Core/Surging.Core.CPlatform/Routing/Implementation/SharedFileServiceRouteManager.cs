@@ -149,11 +149,10 @@ namespace Surging.Core.CPlatform.Routing.Implementation
                 }
                 try
                 {
-                    var serializer = _serializer;
                     routes =
                     (await
                         _serviceRouteFactory.CreateServiceRoutesAsync(
-                            serializer.Deserialize<string, ServiceRouteDescriptor[]>(content))).ToArray();
+                            _serializer.Deserialize<string, ServiceRouteDescriptor[]>(content))).ToArray();
                     if (_logger.IsEnabled(LogLevel.Information))
                         _logger.LogInformation(
                             $"成功获取到以下路由信息：{string.Join(",", routes.Select(i => i.ServiceDescriptor.Id))}。");
@@ -161,7 +160,7 @@ namespace Surging.Core.CPlatform.Routing.Implementation
                 catch (Exception exception)
                 {
                     if (_logger.IsEnabled(LogLevel.Error))
-                        _logger.LogError(exception,"获取路由信息时发生了错误。");
+                        _logger.LogError(exception, "获取路由信息时发生了错误。");
                     routes = new ServiceRoute[0];
                 }
             }
@@ -239,16 +238,9 @@ namespace Surging.Core.CPlatform.Routing.Implementation
                 try
                 {
                     content = File.ReadAllText(_filePath, Encoding.UTF8);
+                    if (string.IsNullOrWhiteSpace(content)) return;
                 }
-                catch (IOException) //还没有操作完，忽略本次修改
-                {
-                    return;
-                }
-                if (!string.IsNullOrWhiteSpace(content))
-                {
-                    await EntryRoutes(_filePath);
-                }
-                else
+                catch (IOException)
                 {
                     return;
                 }
