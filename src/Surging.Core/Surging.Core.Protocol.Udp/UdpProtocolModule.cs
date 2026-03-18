@@ -10,6 +10,7 @@ using Surging.Core.Protocol.Udp.Runtime;
 using Surging.Core.Protocol.Udp.Runtime.Implementation;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace Surging.Core.Protocol.Udp
@@ -65,7 +66,9 @@ namespace Surging.Core.Protocol.Udp
                 var messageListener = provider.Resolve<DotNettyUdpServerMessageListener>();
                 return new UdpServiceHost(async endPoint =>
                 {
-                    await messageListener.StartAsync(endPoint);
+                    var ipEndPoint = endPoint as IPEndPoint;
+                    if (ipEndPoint?.Port > 0)
+                        await messageListener.StartAsync(endPoint);
                     return messageListener;
                 }, serviceExecutor);
 
@@ -89,7 +92,9 @@ namespace Surging.Core.Protocol.Udp
                 var messageListener = provider.Resolve<DotNettyUdpServerMessageListener>();
                 return new UdpServiceHost(async endPoint =>
                 {
-                    await messageListener.StartAsync(endPoint);
+                    var ipEndPoint = endPoint as IPEndPoint;
+                    if (ipEndPoint?.Port > 0)
+                        await messageListener.StartAsync(endPoint);
                     return messageListener;
                 }, serviceExecutor);
 

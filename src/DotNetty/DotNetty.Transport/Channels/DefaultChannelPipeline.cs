@@ -949,7 +949,7 @@ namespace DotNetty.Transport.Channels
 
         public IPromise NewPromise() => new DefaultPromise();
 
-        public IPromise NewPromise(object state) => new DefaultValueTaskPromise(state);
+        public IPromise NewPromise(object state) => new DefaultPromise(state);
 
         public IPromise VoidPromise() => _voidPromise;
 

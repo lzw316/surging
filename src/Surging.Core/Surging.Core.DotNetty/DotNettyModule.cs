@@ -14,6 +14,7 @@ using Surging.Core.CPlatform.Transport.Codec;
 using Surging.Core.ServiceHosting.Internal;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using IServiceHost = Surging.Core.CPlatform.Runtime.Server.IServiceHost;
 
@@ -67,7 +68,9 @@ namespace Surging.Core.DotNetty
                 var messageListener = provider.Resolve<DotNettyServerMessageListener>();
                 return new DefaultServiceHost(async endPoint =>
                 {
-                    await messageListener.StartAsync(endPoint);
+                    var ipEndPoint = endPoint as IPEndPoint;
+                    if (ipEndPoint?.Port > 0)
+                        await messageListener.StartAsync(endPoint);
                     return messageListener;
                 }, serviceExecutor);
             }).As<IServiceHost>();

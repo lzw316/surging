@@ -10,6 +10,7 @@ using Surging.Core.Protocol.Tcp.Runtime.Implementation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -97,7 +98,9 @@ namespace Surging.Core.Protocol.Tcp
                 var messageListener = provider.Resolve<DotNettyTcpServerMessageListener>();
                 return new TcpServiceHost(async endPoint =>
                 {
-                    await messageListener.StartAsync(endPoint);
+                    var ipEndPoint = endPoint as IPEndPoint;
+                    if (ipEndPoint?.Port > 0)
+                        await messageListener.StartAsync(endPoint);
                     return messageListener;
                 });
 
@@ -119,7 +122,9 @@ namespace Surging.Core.Protocol.Tcp
                 var messageListener = provider.Resolve<DotNettyTcpServerMessageListener>();
                 return new TcpServiceHost(async endPoint =>
                 {
-                    await messageListener.StartAsync(endPoint);
+                    var ipEndPoint = endPoint as IPEndPoint;
+                    if (ipEndPoint?.Port > 0)
+                        await messageListener.StartAsync(endPoint);
                     return messageListener;
                 });
 

@@ -69,20 +69,7 @@ namespace Surging.Core.CPlatform
         {
             return hostBuilder.MapServices(mapper =>
             {
-                var serviceEntryManager = mapper.Resolve<IServiceEntryManager>();
-                var addressDescriptors = serviceEntryManager.GetEntries().Select(i =>
-                {
-                    i.Descriptor.Metadatas = null;
-                    return new ServiceSubscriber
-                    {
-                        Address = new[] { new IpAddressModel {
-                             Ip = Dns.GetHostEntry(Dns.GetHostName())
-                             .AddressList.FirstOrDefault<IPAddress>
-                             (a => a.AddressFamily.ToString().Equals("InterNetwork")).ToString() } },
-                        ServiceDescriptor = i.Descriptor
-                    };
-                }).ToList();
-                mapper.Resolve<IServiceSubscribeManager>().SetSubscribersAsync(addressDescriptors);
+                BuildServiceEngine(mapper);
                 mapper.Resolve<IModuleProvider>().Initialize();
             });
         }
