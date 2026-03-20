@@ -14,5 +14,9 @@ namespace Surging.Core.CPlatform.EventExecutor
 
         public IEventLoopGroup GetWorkEventExecutor();
 
+        public IEventLoopGroup GetBossMultithreadExecutor();
+
+        public IEventLoopGroup GetWorkMultithreadExecutor();
+
     }
 }

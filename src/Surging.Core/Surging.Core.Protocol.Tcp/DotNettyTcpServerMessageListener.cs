@@ -112,19 +112,18 @@ namespace Surging.Core.Protocol.Tcp
             if (_logger.IsEnabled(LogLevel.Debug))
                 _logger.LogDebug($"准备启动服务主机，监听地址：{_tcpServerProperties.Host}:{_tcpServerProperties.Port}。");
 
-            IEventLoopGroup bossGroup = _eventExecutorProvider.GetBossEventExecutor();
-            IEventLoopGroup workerGroup = _eventExecutorProvider.GetWorkEventExecutor();//Default eventLoopCount is Environment.ProcessorCount * 2
+            IEventLoopGroup bossGroup = _eventExecutorProvider.GetBossMultithreadExecutor();
+            IEventLoopGroup workerGroup = _eventExecutorProvider.GetWorkMultithreadExecutor();//Default eventLoopCount is Environment.ProcessorCount * 2
             var tcpServiceEntryProvider = ServiceLocator.GetService<ITcpServiceEntryProvider>();
-            var workerGroup1 = _eventExecutorProvider.GetWorkEventExecutor();
-
+            var workerGroup1 = _eventExecutorProvider.GetWorkMultithreadExecutor();
             var bootstrap = new ServerBootstrap();
             bootstrap
             .Channel<TcpServerSocketChannel>()
-            .ChildOption(ChannelOption.SoKeepalive, true)
-            .Option(ChannelOption.SoBacklog, AppConfig.ServerOptions.SoBacklog)
-            .ChildOption(ChannelOption.Allocator, UnpooledByteBufferAllocator.Default)
-            .Group(bossGroup, workerGroup)
-        .ChildHandler(new ActionChannelInitializer<IChannel>( channel =>
+        .ChildOption(ChannelOption.SoKeepalive, true)
+        .Option(ChannelOption.SoBacklog, AppConfig.ServerOptions.SoBacklog)
+        .ChildOption(ChannelOption.Allocator, UnpooledByteBufferAllocator.Default)
+        .Group(bossGroup, workerGroup)
+    .ChildHandler(new ActionChannelInitializer<IChannel>( channel =>
         {
             var pipeline = channel.Pipeline;
             var tcpBehavior = _tcpServiceEntry.Behavior();
